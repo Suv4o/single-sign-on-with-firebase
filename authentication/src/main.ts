@@ -19,12 +19,10 @@ const signInForm = document.getElementById("sign-in-form") as HTMLFormElement;
 let signedInUser: User | null = null;
 
 window.onmessage = function (event) {
-    if (event.origin !== "http://localhost:3001" && event.origin !== "http://localhost:3002") {
-        return;
-    }
-
-    if (event.data === "signOut") {
-        signUserOut();
+    if (event.origin === "http://localhost:3001" || event.origin === "http://localhost:3002") {
+        if (event.data === "signOut") {
+            signUserOut();
+        }
     }
 };
 

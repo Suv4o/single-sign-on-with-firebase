@@ -38,6 +38,10 @@ window.onmessage = function (event) {
         if (event.data === "signOut") {
             signUserOut();
         }
+        if (event.data === "getUserInfo") {
+            window.parent.postMessage(signedInUser, "http://localhost:3001");
+            window.parent.postMessage(signedInUser, "http://localhost:3002");
+        }
     }
 };
 

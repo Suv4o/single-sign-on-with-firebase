@@ -34,25 +34,31 @@ function removeSignInSubmitListener(signInForm: HTMLFormElement) {
 let signedInUser: User | null = null;
 
 window.onmessage = function (event) {
-    if (event.origin === "http://localhost:3001" || event.origin === "http://localhost:3002") {
+    if (event.origin === "https://localhost:3001" || event.origin === "https://localhost:3002") {
         if (event.data === "signOut") {
             signUserOut();
         }
         if (event.data === "getUserInfo") {
-            window.parent.postMessage(signedInUser, "http://localhost:3001");
-            window.parent.postMessage(signedInUser, "http://localhost:3002");
+            sendUserInfo();
         }
     }
 };
+
+function sendUserInfo() {
+    window.parent.postMessage(JSON.parse(JSON.stringify(signedInUser)), "https://localhost:3001");
+    window.parent.postMessage(JSON.parse(JSON.stringify(signedInUser)), "https://localhost:3002");
+}
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
         signedInUser = user;
         removeSignInSubmitListener(document.getElementById("sign-in-form") as HTMLFormElement);
         setSignedInComponent();
+        sendUserInfo();
     } else {
         setSignInComponent();
         setSignInSubmitListener(document.getElementById("sign-in-form") as HTMLFormElement);
+        sendUserInfo();
     }
 });
 

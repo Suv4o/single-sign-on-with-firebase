@@ -3,19 +3,34 @@ import { onAuthStateChanged, User } from "firebase/auth";
 import { parseFirebaseError, isFirebaseError } from "./utils";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import componentSignIn from "./components/sign-in-from";
+import componentSignedIn from "./components/signed-in";
 
 const firebase = new FirebaseConfig();
 const auth = firebase.auth();
 
 const app = document.getElementById("app") as HTMLIFrameElement;
-setComponent([componentSignIn()]);
 
-function setComponent(components: string[]) {
-    const component = components.join("");
-    app.innerHTML = component;
+function setSignInComponent() {
+    app.innerHTML = componentSignIn();
 }
 
-const signInForm = document.getElementById("sign-in-form") as HTMLFormElement;
+function setSignedInComponent() {
+    app.innerHTML = componentSignedIn();
+}
+
+function setSignInSubmitListener(signInForm: HTMLFormElement) {
+    signInForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = signInForm["email"].value;
+        const password = signInForm["password"].value;
+        signUserIn(email, password);
+    });
+}
+
+function removeSignInSubmitListener(signInForm: HTMLFormElement) {
+    signInForm?.removeEventListener("submit", () => {});
+}
+
 let signedInUser: User | null = null;
 
 window.onmessage = function (event) {
@@ -26,18 +41,14 @@ window.onmessage = function (event) {
     }
 };
 
-signInForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const email = signInForm["email"].value;
-    const password = signInForm["password"].value;
-    signUserIn(email, password);
-});
-
 onAuthStateChanged(auth, (user) => {
     if (user) {
         signedInUser = user;
+        removeSignInSubmitListener(document.getElementById("sign-in-form") as HTMLFormElement);
+        setSignedInComponent();
     } else {
-        console.log("User is not signed in");
+        setSignInComponent();
+        setSignInSubmitListener(document.getElementById("sign-in-form") as HTMLFormElement);
     }
 });
 

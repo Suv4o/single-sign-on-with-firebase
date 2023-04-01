@@ -1,34 +1,34 @@
+import componentNavigation from "./components/navigation";
+
 window.onmessage = function (e) {
-    console.log(e.data);
+    setUserInfo(e.data);
 };
 
-const app = document.querySelector("#app") as HTMLDivElement;
-setIframe();
+const navigation = document.querySelector("#navigation") as HTMLDivElement;
+const signInIframe = document.querySelector("#sign-in-iframe") as HTMLIFrameElement;
 
-function setIframe() {
-    app.innerHTML = /*html*/ `<iframe id="sign-in-form" src="https://localhost:3000" class="w-[100vw] h-[100vh]"></iframe>`;
+setNavigationComponent();
+setSignInIframe();
+
+function setUserInfo(userInfo: any) {
+    setNavigationComponent(userInfo);
 }
 
-// const signInForm = document.querySelector("#sign-in-form") as HTMLIFrameElement;
-// signInForm.contentWindow.postMessage("signOut", "https://localhost:3000");
+function setNavigationComponent(userInfo: any = null) {
+    navigation.innerHTML = componentNavigation(userInfo?.email, userInfo === null ? false : true);
+    if (userInfo !== null) {
+        const signOutButton = document.querySelector("#sign-out-button") as HTMLButtonElement;
+        signOutButton.addEventListener("click", signOut);
+    }
+}
 
-// const getUser = document.querySelector("#get-user") as HTMLButtonElement;
-// const signInForm = document.querySelector("#sign-in-form") as HTMLIFrameElement;
+function setSignInIframe() {
+    signInIframe.innerHTML = /*html*/ `<iframe id="sign-in-form" src="https://localhost:3000" class="w-[100vw] h-[600px]"></iframe>`;
+}
 
-// signInForm.onload = () => {
-//     if (signInForm.contentWindow) {
-//         signInForm.contentWindow.postMessage("getUserInfo", "https://localhost:3000");
-//     }
-// };
-
-// signInForm.addEventListener("load", () => {
-//     if (signInForm.contentWindow) {
-//         signInForm.contentWindow.postMessage("signOut", "https://localhost:3000");
-//     }
-// });
-
-// getUser.addEventListener("click", () => {
-//     signInForm.contentWindow.postMessage("getUserInfo", "https://localhost:3000");
-// });
-
-export default {};
+function signOut() {
+    const iFrame = document.querySelector("#sign-in-form") as HTMLIFrameElement;
+    if (iFrame.contentWindow) {
+        iFrame.contentWindow.postMessage("signOut", "https://localhost:3000");
+    }
+}
